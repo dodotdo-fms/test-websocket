@@ -17,12 +17,13 @@
 
 static struct lws*	wsi;
 
-int _pv1_enc(char* out, const char* event, const char* data)
+int _pv1_enc(char* out, const char* event, const char* data, size_t len)
 {
-	strcpy(out, event);
-	strcat(out, " ");
-	strcat(out, data);
-	return	0;
+	char*	p1	= out;
+	strcpy(p1, event);	p1	+= strlen(event);
+	strcat(p1, " ");	p1	++;
+	memcpy(p1, data, len);
+	return	strlen(event) +1+ len;
 }
 int _pv1_dec(char** out, char* data, size_t len)
 {
@@ -48,16 +49,26 @@ dodotdo_distro_v1(struct lws *wsi, enum lws_callback_reasons reason, void *user,
 		break;
 
 	case LWS_CALLBACK_CLIENT_ESTABLISHED:
-		lws_callback_on_writable(wsi);
+		{
+			lws_callback_on_writable(wsi);
 
-		_pv1_enc(tmp1, "/login", "{\"userid\":\"root\",\"passwd\":\"1234\"}");
-		printf("SEND   %s\n", tmp1);
-		lws_write(wsi, (unsigned char*)tmp1, strlen(tmp1), LWS_WRITE_TEXT);
+			char*d1	= "{\"userid\":\"root\",\"passwd\":\"1234\"}";
+			int len	= _pv1_enc(tmp1, "/login", d1, strlen(d1));
+			printf("SEND   %d, %s\n", len, tmp1);
+			lws_write(wsi, (unsigned char*)tmp1, len, LWS_WRITE_TEXT);
+		}
 		break;
 
 	case LWS_CALLBACK_CLIENT_RECEIVE:
 		_pv1_dec(tmp2, in, len);
 		printf("RECVD  event=%s data=%s\n", tmp2[0], tmp2[1]);
+
+		if (strcmp(tmp2[0], "/logind") == 0)
+		{
+			char dat[]	= {1,2,3,4,5};
+			int	len	= _pv1_enc(tmp1, "/test1", (char*)dat, sizeof(dat));
+			lws_write(wsi, (unsigned char*)tmp1, len, LWS_WRITE_TEXT);
+		}
 		break;
 
 	case LWS_CALLBACK_CLIENT_WRITEABLE:
