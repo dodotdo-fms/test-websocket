@@ -55,7 +55,7 @@ dodotdo_distro_v1(struct lws *wsi, enum lws_callback_reasons reason, void *user,
 		{
 			lws_callback_on_writable(wsi);
 
-			char*d1	= "{\"userid\":\"staff1\",\"passwd\":\"1111\"}";
+			char*d1	= "{\"userid\":\"staff2\",\"passwd\":\"1111\"}";
 			int len	= _pv1_enc(tmp1, "/login", d1, strlen(d1));
 			printf("SEND   %d, %s\n", len, tmp1);
 			lws_write(wsi, (unsigned char*)tmp1, len, LWS_WRITE_TEXT);
@@ -87,6 +87,7 @@ dodotdo_distro_v1(struct lws *wsi, enum lws_callback_reasons reason, void *user,
 
 			lws_write(wsi, (unsigned char*)tmp1, len, LWS_WRITE_TEXT);
 		}
+#if 0
 		else if (strncmp(namespace_buf, "/channel/joind", 14) == 0)
 		{
 			char*d3	= "{\"channelId\":2}";
@@ -99,7 +100,10 @@ dodotdo_distro_v1(struct lws *wsi, enum lws_callback_reasons reason, void *user,
 			lws_callback_on_writable(wsi);
 
 			lws_write(wsi, (unsigned char*)tmp1, len, LWS_WRITE_TEXT);
+
 		}
+#endif
+#if 0
 		else if (strncmp(namespace_buf, "/stream/lockd", 14) == 0 || strncmp(namespace_buf, "/stream/data", 12) == 0)
 		{
 			if (send_count < 20)
@@ -134,6 +138,7 @@ dodotdo_distro_v1(struct lws *wsi, enum lws_callback_reasons reason, void *user,
 		}
 
 		break;
+#endif
 
 	default:
 		break;
